@@ -58,10 +58,10 @@ CURR_INIT=""
 INIT_NUM=0
 while read LINE ; do
   case "${LINE}" in
-    --*) # skip
+    \#*) # skip
          ;;
 
-      *) HEX=`echo "obase=16; ibase=2; ${LINE}" | bc`
+      *) HEX=`echo "obase=16; ibase=2; ${LINE}" | sed -e ' s/-/0/g ' | sed -e ' s/@/1/g ' | bc`
 
          CURR_ELEM=$((${CURR_ELEM} + 1))
 #         echo ${CURR_ELEM}
