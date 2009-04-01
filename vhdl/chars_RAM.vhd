@@ -70,6 +70,7 @@ entity chars_RAM is
     i_SSR : in std_logic;               -- Synchronous Set/Reset Input
 
     i_clock_r : in  std_logic;          -- Read Clock
+    i_EN_r    : in  std_logic;
     i_ADDR_r  : in  std_logic_vector(12 downto 0);  -- Read 13-bit Address Input
     o_DO_r    : out std_logic_vector(7 downto 0)    -- Read 8-bit Data Output
     );
@@ -161,7 +162,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => '1',                     -- RAM Enable Input
+      ENA   => i_EN_r,                     -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock
@@ -259,7 +260,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => '1',                     -- RAM Enable Input
+      ENA   => i_EN_r,                     -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock
@@ -357,7 +358,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => '1',                     -- RAM Enable Input
+      ENA   => i_EN_r,                     -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock
@@ -455,7 +456,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => '1',                     -- RAM Enable Input
+      ENA   => i_EN_r,                     -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock

@@ -62,9 +62,9 @@ entity charmaps_ROM is
   port (
     -- i_DI    : in std_logic_vector(7 downto 0);    -- 8-bit Data Input
     -- i_DIP   : in std_logic;                       -- 1-bit parity Input
-    -- i_EN    : in std_logic;                       -- RAM Enable Input
     -- i_WE    : in std_logic;                       -- Write Enable Input
     -- i_SSR   : in std_logic;                       -- Synchronous Set/Reset Input
+    i_EN    : in std_logic;                       -- RAM Enable Input
     i_clock : in  std_logic;                      -- Clock
     i_ADDR  : in  std_logic_vector(10 downto 0);  -- 11-bit Address Input
     o_DO    : out std_logic_vector(7 downto 0)    -- 8-bit Data Output
@@ -73,8 +73,9 @@ entity charmaps_ROM is
 end charmaps_ROM;
 
 architecture rtl of charmaps_ROM is
-
+  signal s_EN : std_logic;
 begin
+  s_EN <= i_EN;
   -- charmaps
   -- |------| |-----------------|
   -- |   P  | | D D D D D D D D |
@@ -111,7 +112,7 @@ begin
     port map(
       DI   => (others => '1'),          -- 8-bit Data Input
       DIP  => (others => '1'),          -- 1-bit parity Input
-      EN   => '1',                      -- RAM Enable Input
+      EN   => s_EN,                      -- RAM Enable Input
       WE   => '0',                      -- Write Enable Input
       SSR  => '0',                      -- Synchronous Set/Reset Input
       CLK  => i_clock,                  -- Clock

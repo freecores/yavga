@@ -62,9 +62,9 @@ entity charmaps_ROM is
   port (
     -- i_DI    : in std_logic_vector(7 downto 0);    -- 8-bit Data Input
     -- i_DIP   : in std_logic;                       -- 1-bit parity Input
-    -- i_EN    : in std_logic;                       -- RAM Enable Input
     -- i_WE    : in std_logic;                       -- Write Enable Input
     -- i_SSR   : in std_logic;                       -- Synchronous Set/Reset Input
+    i_EN    : in std_logic;                       -- RAM Enable Input
     i_clock : in  std_logic;                      -- Clock
     i_ADDR  : in  std_logic_vector(10 downto 0);  -- 11-bit Address Input
     o_DO    : out std_logic_vector(7 downto 0)    -- 8-bit Data Output
@@ -73,8 +73,9 @@ entity charmaps_ROM is
 end charmaps_ROM;
 
 architecture rtl of charmaps_ROM is
-
+  signal s_EN : std_logic;
 begin
+  s_EN <= i_EN;
   -- charmaps
   -- |------| |-----------------|
   -- |   P  | | D D D D D D D D |
@@ -90,6 +91,7 @@ begin
       INIT       => B"000000000",  --  Value of output RAM registers at startup
       SRVAL      => B"000000000",       --  Ouput value upon SSR assertion
       --
+      -- START REPLACE HERE THE OUTPUT FROM convert.sh
       INIT_00    => X"000000FF0000FF0000FF0000FF00000000000000000000000000000000000000",
       INIT_01    => X"0000242424242424242424242424000000000000FF0000FF0000FF0000FF0000",
       INIT_02    => X"0000929292929292929292929292000000004949494949494949494949490000",
@@ -154,6 +156,7 @@ begin
       INIT_3D    => X"00000010202020408040202020100000000000FE40300804FE00000000000000",
       INIT_3E    => X"0000001008080804020408080810000000000010101010101010101010100000",
       INIT_3F    => X"00000000000000000000000000000000000000000000000C9260000000000000",
+      -- STOP REPLACE		
       --
       INITP_00   => X"0000000000000000000000000000000000000000000000000000000000000000",  -- free
       INITP_01   => X"0000000000000000000000000000000000000000000000000000000000000000",
@@ -167,7 +170,7 @@ begin
     port map(
       DI   => (others => '1'),          -- 8-bit Data Input
       DIP  => (others => '1'),          -- 1-bit parity Input
-      EN   => '1',                      -- RAM Enable Input
+      EN   => s_EN,                      -- RAM Enable Input
       WE   => '0',                      -- Write Enable Input
       SSR  => '0',                      -- Synchronous Set/Reset Input
       CLK  => i_clock,                  -- Clock
