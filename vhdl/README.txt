@@ -21,7 +21,8 @@ s3e_starter_1600k.ucf
 
 s3e_starter_1600k.vhd
   The top vhdl to use to test the vga controller with the DIGILENT s3e_starter_1600k kit.
-  The test write random chars to the screen each few seconds.
+  The test write random chars to the screen each few seconds (currently the random write
+   is replaced by some ?debug? char write and by some config params write...).
 
 vga_ctrl.vhd
   The vga controller main file
