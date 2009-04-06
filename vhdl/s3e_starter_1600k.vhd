@@ -52,6 +52,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
+use work.yavga_pkg.all;
+
 ---- Uncomment the following library declaration if instantiating
 ---- any Xilinx primitives in this code.
 --library UNISIM;
@@ -74,22 +76,22 @@ architecture Behavioral of s3e_starter_1600k is
       i_reset        : in  std_logic;
       i_h_sync_en    : in  std_logic;
       i_v_sync_en    : in  std_logic;
-      i_chr_addr     : in  std_logic_vector(10 downto 0);
-      i_chr_data     : in  std_logic_vector(31 downto 0);
+      i_chr_addr     : in  std_logic_vector(c_CHR_ADDR_BUS_W - 1 downto 0);
+      i_chr_data     : in  std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0);
       i_chr_clk      : in  std_logic;
       i_chr_en       : in  std_logic;
       i_chr_we       : in  std_logic_vector(3 downto 0);
       i_chr_rst      : in  std_logic;
-      i_wav_d        : in  std_logic_vector(15 downto 0);
+      i_wav_d        : in  std_logic_vector(c_WAVFRM_DATA_BUS_W - 1 downto 0);
       i_wav_clk      : in  std_logic;
       i_wav_we       : in  std_logic;
-      i_wav_addr     : in  std_logic_vector(9 downto 0);
+      i_wav_addr     : in  std_logic_vector(c_WAVFRM_ADDR_BUS_W - 1 downto 0);
       o_h_sync       : out std_logic;
       o_v_sync       : out std_logic;
       o_r            : out std_logic;
       o_g            : out std_logic;
       o_b            : out std_logic;
-      o_chr_data     : out std_logic_vector(31 downto 0)
+      o_chr_data     : out std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0)
       );
   end component;
 
@@ -102,13 +104,13 @@ architecture Behavioral of s3e_starter_1600k is
   signal s_vsync_count : std_logic_vector(7 downto 0) := (others => '0');
   signal s_vsync1      : std_logic;
 
-  signal s_chr_addr : std_logic_vector(10 downto 0);-- := (others => '0');
-  signal s_chr_data : std_logic_vector(31 downto 0);-- := (others => '0');
-  signal s_rnd      : std_logic_vector(31 downto 0);-- := (others => '0');
+  signal s_chr_addr : std_logic_vector(c_CHR_ADDR_BUS_W - 1 downto 0);-- := (others => '0');
+  signal s_chr_data : std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0);-- := (others => '0');
+  signal s_rnd      : std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0);-- := (others => '0');
   signal s_chr_we   : std_logic_vector(3 downto 0);
   
-  signal s_wav_addr : std_logic_vector(9 downto 0);
-  signal s_wav_d : std_logic_vector(15 downto 0);
+  signal s_wav_addr : std_logic_vector(c_WAVFRM_ADDR_BUS_W - 1 downto 0);
+  signal s_wav_d : std_logic_vector(c_WAVFRM_DATA_BUS_W - 1 downto 0);
   signal s_mul : std_logic_vector(7 downto 0);
   
   signal s_initialized : std_logic := '0';
@@ -204,7 +206,7 @@ begin
             s_chr_data <= "01010001" & "01010010" & "01010011" & "01010100";
           when "101" => -- write config grid and cursor color
             s_chr_we   <= "1111";
-            s_chr_addr <= "00000011011"; -- 108 >> 2
+            s_chr_addr <= c_BG_CUR_COLOR_ADDR(c_BG_CUR_COLOR_ADDR'left downto 2); -- c_BG_CUR_COLOR_ADDR >> 2
             --             ND   bgColor grid,cur   ND       curs_x          curs_y
             s_chr_data <= "00" & "000" & "101" & "000" & "00111000010" & "0101011110";
             --            |--------108-------|-------109-------|----110-----|--111--|

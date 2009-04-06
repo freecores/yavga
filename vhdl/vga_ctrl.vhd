@@ -52,6 +52,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
+use work.yavga_pkg.all;
+
 ---- Uncomment the following library declaration if instantiating
 ---- any Xilinx primitives in this code.
 --library UNISIM;
@@ -81,19 +83,19 @@ entity vga_ctrl is
     o_b : out std_logic;
 
     -- chars RAM memory
-    i_chr_addr : in  std_logic_vector(10 downto 0);
-    i_chr_data : in  std_logic_vector(31 downto 0);
-    o_chr_data : out std_logic_vector(31 downto 0);
+    i_chr_addr : in  std_logic_vector(c_CHR_ADDR_BUS_W - 1 downto 0);
+    i_chr_data : in  std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0);
+    o_chr_data : out std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0);
     i_chr_clk  : in  std_logic;
     i_chr_en   : in  std_logic;
     i_chr_we   : in  std_logic_vector(3 downto 0);
     i_chr_rst  : in  std_logic;
 
     -- waveform RAM memory
-    i_wav_d    : in std_logic_vector(15 downto 0);
+    i_wav_d    : in std_logic_vector(c_WAVFRM_DATA_BUS_W - 1 downto 0);
     i_wav_we   : in std_logic;
     i_wav_clk : IN std_logic;
-    i_wav_addr : in std_logic_vector(9 downto 0)  --;
+    i_wav_addr : in std_logic_vector(c_WAVFRM_ADDR_BUS_W - 1 downto 0)  --;
     --o_DOA : OUT std_logic_vector(15 downto 0)
     );
 end vga_ctrl;
@@ -130,37 +132,6 @@ end vga_ctrl;
 
 architecture rtl of vga_ctrl is
 
-  constant c_GRID_SIZE : std_logic_vector(6 downto 0) := "1111111";
-  constant c_GRID_BIT  : integer                      := 6;
-
-  --
-  -- horizontal timing signals (in pixels count )
-  constant c_H_DISPLAYpx    : integer := 800;
-  constant c_H_BACKPORCHpx  : integer := 63;  -- also 60;
-  constant c_H_SYNCTIMEpx   : integer := 120;
-  constant c_H_FRONTPORCHpx : integer := 56;  --also 60;
-  constant c_H_PERIODpx     : integer := c_H_DISPLAYpx +
-                                         c_H_BACKPORCHpx +
-                                         c_H_SYNCTIMEpx +
-                                         c_H_FRONTPORCHpx;
-
-  --
-  -- vertical timing signals (in lines count)
-  constant c_V_DISPLAYln    : integer := 600;
-  constant c_V_BACKPORCHln  : integer := 23;
-  constant c_V_SYNCTIMEln   : integer := 6;
-  constant c_V_FRONTPORCHln : integer := 37;
-  constant c_V_PERIODln     : integer := c_V_DISPLAYln +
-                                         c_V_BACKPORCHln +
-                                         c_V_SYNCTIMEln +
-                                         c_V_FRONTPORCHln;
-
-
---  constant c_CHARS_WIDTH: std_logic_vector(2 downto 0) := "111";
---  constant c_CHARS_HEIGHT: std_logic_vector(3 downto 0) := "1111";
---  constant c_CHARS_COLS: std_logic_vector(6 downto 0) := "1100011";
---  constant c_CHARS_ROWS: std_logic_vector(5 downto 0) := "100100";
-
   --
   signal s_h_count      : std_logic_vector(10 downto 0);  -- horizontal pixel counter
   signal s_v_count      : std_logic_vector(9 downto 0);  -- verticalal line counter
@@ -171,8 +142,8 @@ architecture rtl of vga_ctrl is
   --
   -- signals for the charmaps Block RAM component...
   signal s_charmaps_en : std_logic;
-  signal s_charmaps_ADDR : std_logic_vector (10 downto 0);
-  signal s_charmaps_DO   : std_logic_vector (7 downto 0);
+  signal s_charmaps_ADDR : std_logic_vector (c_INTCHMAP_ADDR_BUS_W - 1 downto 0);
+  signal s_charmaps_DO   : std_logic_vector (c_INTCHMAP_DATA_BUS_W - 1 downto 0);
 
   --
   -- to manage the outside display region's blanking
@@ -181,14 +152,13 @@ architecture rtl of vga_ctrl is
 
   --
   -- to manage the chars  ram address and the ram ascii
-  signal s_chars_ram_addr : std_logic_vector(12 downto 0);
-  signal s_chars_ascii    : std_logic_vector(7 downto 0);
+  signal s_chars_ram_addr : std_logic_vector(c_INTCHR_ADDR_BUS_W - 1 downto 0);
+  signal s_chars_ascii    : std_logic_vector(c_INTCHR_DATA_BUS_W - 1 downto 0);
   signal s_chars_EN_r : std_logic;
 
   -- to manage the waveform ram address and data
-  signal s_waveform_ADDRB : std_logic_vector (9 downto 0);
-  signal s_waveform_DOB   : std_logic_vector (15 downto 0);  
-  
+  signal s_waveform_ADDRB : std_logic_vector (c_WAVFRM_ADDR_BUS_W - 1 downto 0);
+  signal s_waveform_DOB   : std_logic_vector (c_WAVFRM_DATA_BUS_W - 1 downto 0);
 
 
   -- charmaps
@@ -204,8 +174,8 @@ architecture rtl of vga_ctrl is
     port(
       i_EN    : in std_logic;
       i_clock : in  std_logic;
-      i_ADDR  : in  std_logic_vector(10 downto 0);  -- 16 x ascii code (W=8 x H=16 pixel)
-      o_DO    : out std_logic_vector(7 downto 0)    -- 8 bit char pixel
+      i_ADDR  : in  std_logic_vector(c_INTCHMAP_ADDR_BUS_W - 1 downto 0);  -- 16 x ascii code (W=8 x H=16 pixel)
+      o_DO    : out std_logic_vector(c_INTCHMAP_DATA_BUS_W - 1 downto 0)    -- 8 bit char pixel
       );
   end component;
 
@@ -241,14 +211,14 @@ architecture rtl of vga_ctrl is
       i_clock_rw : in  std_logic;
       i_EN_rw    : in  std_logic;
       i_WE_rw    : in  std_logic_vector(3 downto 0);
-      i_ADDR_rw  : in  std_logic_vector(10 downto 0);
-      i_DI_rw    : in  std_logic_vector(31 downto 0);
-      o_DI_rw    : out std_logic_vector(31 downto 0);
+      i_ADDR_rw  : in  std_logic_vector(c_CHR_ADDR_BUS_W - 1 downto 0);
+      i_DI_rw    : in  std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0);
+      o_DI_rw    : out std_logic_vector(c_CHR_DATA_BUS_W - 1 downto 0);
       i_SSR      : in  std_logic;
       i_clock_r  : in  std_logic;
       i_EN_r     : in  std_logic;
-      i_ADDR_r   : in  std_logic_vector(12 downto 0);
-      o_DO_r     : out std_logic_vector(7 downto 0)
+      i_ADDR_r   : in  std_logic_vector(c_INTCHR_ADDR_BUS_W - 1 downto 0);
+      o_DO_r     : out std_logic_vector(c_INTCHR_DATA_BUS_W - 1 downto 0)
       );
   end component;
 
@@ -262,14 +232,10 @@ architecture rtl of vga_ctrl is
   signal s_config_time : std_logic;
   --
   -- to manage the background and cursor colors
-  constant c_BG_CUR_COLOR_ADDR  : std_logic_vector(12 downto 0) := "0000001101100"; -- 108 BG:5..3 CUR:2..0
   signal s_cursor_color : std_logic_vector(2 downto 0):= "000";
   signal s_bg_color : std_logic_vector(2 downto 0):= "000";
   --
   -- to manage the cursor position  
-  constant c_CURS_XY1  : std_logic_vector(12 downto 0) := "0000001101101"; -- 109
-  constant c_CURS_XY2  : std_logic_vector(12 downto 0) := "0000001101110"; -- 110
-  constant c_CURS_XY3  : std_logic_vector(12 downto 0) := "0000001101111"; -- 111
   signal s_cursor_x : std_logic_vector(10 downto 0);
   signal s_cursor_y : std_logic_vector(9 downto 0);
 
@@ -279,18 +245,18 @@ begin
   begin
     if rising_edge(i_clk) then
         case s_chars_ram_addr is
-          when c_BG_CUR_COLOR_ADDR =>
+          when c_BG_CUR_COLOR_ADDR => -- bg and curs color are on the same byte byte
             s_config_time <= '1';
             s_cursor_color <= s_chars_ascii(2 downto 0);
             s_bg_color <= s_chars_ascii(5 downto 3);
-          when c_CURS_XY1 =>
+          when c_CURS_XY1 => -- xy coords spans on three bytes 
             s_config_time <= '1';
             s_cursor_x(10 downto 6) <= s_chars_ascii(4 downto 0);
-          when c_CURS_XY2 =>
+          when c_CURS_XY2 => -- xy coords spans on three bytes
             s_config_time <= '1';
             s_cursor_x(5 downto 0) <= s_chars_ascii(7 downto 2);
             s_cursor_y(9 downto 8) <= s_chars_ascii(1 downto 0);
-          when c_CURS_XY3 =>
+          when c_CURS_XY3 => -- xy coords spans on three bytes
             s_config_time <= '1';
             s_cursor_y(7 downto 0) <= s_chars_ascii(7 downto 0);
           when others =>
@@ -321,8 +287,8 @@ begin
     );
 
 
-  -- modify the charmaps address (each 8 s_h_count - chars are 8 pixel tall)
-  --                  v----- ascii code ------v    v-- vert px mod 16 --v (chars are 8 pixel tall)
+  -- modify the charmaps address (each 16 s_v_count - chars are 16 pixel tall)
+  --                  v----- ascii code ------v    v-- vert px mod 16 --v (chars are 16 pixel tall)
   --s_charmaps_ADDR <= (s_chars_ascii(6 downto 0) & s_v_count(3 downto 0));
   s_charmaps_ADDR <= (s_chars_ascii(6 downto 0) & s_v_count_d_4);
   s_charmaps_en <= 
