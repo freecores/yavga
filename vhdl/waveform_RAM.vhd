@@ -52,6 +52,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
+use work.yavga_pkg.all;
+
 --  Uncomment the following lines to use the declarations that are
 --  provided for instantiating Xilinx primitive components.
 library UNISIM;
@@ -59,24 +61,24 @@ use UNISIM.VComponents.all;
 
 entity waveform_RAM is
   port (
-    i_DIA    : in  std_logic_vector(15 downto 0);  -- 16-bit Data Input
+    i_DIA    : in  std_logic_vector(c_WAVFRM_DATA_BUS_W - 1 downto 0);  -- 16-bit Data Input
     -- i_DIPA   : in std_logic;                       -- 2-bit parity Input
     -- i_ENA    : in std_logic;                       -- RAM Enable Input
-    i_WEA    : in  std_logic;                      -- Write Enable Input
+    i_WEA    : in  std_logic;           -- Write Enable Input
     -- i_SSRA   : in std_logic;                       -- Synchronous Set/Reset Input
-    i_clockA : in  std_logic;                      -- Clock
-    i_ADDRA  : in  std_logic_vector(9 downto 0);   -- 10-bit Address Input
-    --o_DOA     : out std_logic_vector(15 downto 0);  -- 16-bit Data Output
+    i_clockA : in  std_logic;           -- Clock
+    i_ADDRA  : in  std_logic_vector(c_WAVFRM_ADDR_BUS_W - 1 downto 0);  -- 10-bit Address Input
+    --o_DOA     : out std_logic_vector(c_WAVFRM_DATA_BUS_W - 1 downto 0);  -- 16-bit Data Output
     -- o_DOPA   : out std_logic                       -- 2-bit parity Output
     --
-    i_DIB    : in  std_logic_vector(15 downto 0);  -- 16-bit Data Input
+    i_DIB    : in  std_logic_vector(c_WAVFRM_DATA_BUS_W - 1 downto 0);  -- 16-bit Data Input
     -- i_DIPB   : in std_logic;                       -- 2-bit parity Input
     -- i_ENB    : in std_logic;                       -- RAM Enable Input
-    i_WEB    : in  std_logic;                      -- Write Enable Input
+    i_WEB    : in  std_logic;           -- Write Enable Input
     -- i_SSRB   : in std_logic;                       -- Synchronous Set/Reset Input
-    i_clockB : in  std_logic;                      -- Clock
-    i_ADDRB  : in  std_logic_vector(9 downto 0);   -- 10-bit Address Input
-    o_DOB    : out std_logic_vector(15 downto 0)   -- 16-bit Data Output
+    i_clockB : in  std_logic;           -- Clock
+    i_ADDRB  : in  std_logic_vector(c_WAVFRM_ADDR_BUS_W - 1 downto 0);  -- 10-bit Address Input
+    o_DOB    : out std_logic_vector(c_WAVFRM_DATA_BUS_W - 1 downto 0)  -- 16-bit Data Output
     -- o_DOPB   : out std_logic                       -- 2-bit parity Output
     );
 end waveform_RAM;

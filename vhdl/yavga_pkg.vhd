@@ -14,6 +14,7 @@ package yavga_pkg is
   -- chars address and data bus size
   constant c_CHR_ADDR_BUS_W : integer := 11;
   constant c_CHR_DATA_BUS_W : integer := 32;
+  constant c_CHR_WE_BUS_W   : integer := 4;
 
   -- internal used chars address and data bus size 
   constant c_INTCHR_ADDR_BUS_W : integer := 13;
@@ -40,6 +41,7 @@ package yavga_pkg is
                                          c_H_BACKPORCHpx +
                                          c_H_SYNCTIMEpx +
                                          c_H_FRONTPORCHpx;
+  constant c_H_COUNT_W : integer := 11;       -- = ceil(ln2(c_H_PERIODpx))
 
   --
   -- vertical timing signals (in lines count)
@@ -51,7 +53,10 @@ package yavga_pkg is
                                          c_V_BACKPORCHln +
                                          c_V_SYNCTIMEln +
                                          c_V_FRONTPORCHln;
+  constant c_V_COUNT_W : integer := 10;  -- = ceil(ln2(c_V_PERIODln))
 
+  constant c_X_W : integer := c_H_COUNT_W;
+  constant c_Y_W : integer := c_V_COUNT_W;
 
 --  constant c_CHARS_WIDTH: std_logic_vector(2 downto 0) := "111";
 --  constant c_CHARS_HEIGHT: std_logic_vector(3 downto 0) := "1111";
@@ -59,12 +64,12 @@ package yavga_pkg is
 --  constant c_CHARS_ROWS: std_logic_vector(5 downto 0) := "100100";
 
   -- to manage the background and cursor colors
-  constant c_BG_CUR_COLOR_ADDR : std_logic_vector(12 downto 0) := "0000001101100";  -- 108 BG:5..3 CUR:2..0
+  constant c_CFG_BG_CUR_COLOR_ADDR : std_logic_vector(12 downto 0) := "0000001101100";  -- 108 BG:5..3 CUR:2..0
 
   -- to manage the cursor position  
-  constant c_CURS_XY1 : std_logic_vector(12 downto 0) := "0000001101101";  -- 109
-  constant c_CURS_XY2 : std_logic_vector(12 downto 0) := "0000001101110";  -- 110
-  constant c_CURS_XY3 : std_logic_vector(12 downto 0) := "0000001101111";  -- 111
+  constant c_CFG_CURS_XY1 : std_logic_vector(12 downto 0) := "0000001101101";  -- 109
+  constant c_CFG_CURS_XY2 : std_logic_vector(12 downto 0) := "0000001101110";  -- 110
+  constant c_CFG_CURS_XY3 : std_logic_vector(12 downto 0) := "0000001101111";  -- 111
   
 end yavga_pkg;
 

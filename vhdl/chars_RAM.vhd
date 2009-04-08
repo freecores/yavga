@@ -53,6 +53,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
+use work.yavga_pkg.all;
+
 -- Uncomment the following lines to use the declarations that are
 -- provided for instantiating Xilinx primitive components.
 library UNISIM;
@@ -62,7 +64,7 @@ entity chars_RAM is
   port (
     i_clock_rw : in  std_logic;         -- Write Clock
     i_EN_rw    : in  std_logic;         -- Write RAM Enable Input
-    i_WE_rw    : in  std_logic_vector(3 downto 0);   -- Write Enable Input
+    i_WE_rw    : in  std_logic_vector(c_CHR_WE_BUS_W - 1 downto 0);  -- Write Enable Input
     i_ADDR_rw  : in  std_logic_vector(10 downto 0);  -- Write 11-bit Address Input
     i_DI_rw    : in  std_logic_vector(31 downto 0);  -- Write 32-bit Data Input
     o_DI_rw    : out std_logic_vector(31 downto 0);  -- Write 32-bit Data Input
@@ -162,7 +164,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => i_EN_r,                     -- RAM Enable Input
+      ENA   => i_EN_r,                  -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock
@@ -260,7 +262,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => i_EN_r,                     -- RAM Enable Input
+      ENA   => i_EN_r,                  -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock
@@ -358,7 +360,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => i_EN_r,                     -- RAM Enable Input
+      ENA   => i_EN_r,                  -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock
@@ -456,7 +458,7 @@ begin
       -- read
       DIA   => (others => '0'),         -- 2-bit Data Input
       DIPA  => (others => '0'),
-      ENA   => i_EN_r,                     -- RAM Enable Input
+      ENA   => i_EN_r,                  -- RAM Enable Input
       WEA   => '0',                     -- Write Enable Input
       SSRA  => i_SSR,                   -- Synchronous Set/Reset Input
       CLKA  => i_clock_r,               -- Clock

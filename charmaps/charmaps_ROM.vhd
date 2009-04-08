@@ -53,6 +53,8 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.STD_LOGIC_UNSIGNED.all;
 
+use work.yavga_pkg.all;
+
 --  Uncomment the following lines to use the declarations that are
 --  provided for instantiating Xilinx primitive components.
 library UNISIM;
@@ -64,10 +66,10 @@ entity charmaps_ROM is
     -- i_DIP   : in std_logic;                       -- 1-bit parity Input
     -- i_WE    : in std_logic;                       -- Write Enable Input
     -- i_SSR   : in std_logic;                       -- Synchronous Set/Reset Input
-    i_EN    : in std_logic;                       -- RAM Enable Input
-    i_clock : in  std_logic;                      -- Clock
-    i_ADDR  : in  std_logic_vector(10 downto 0);  -- 11-bit Address Input
-    o_DO    : out std_logic_vector(7 downto 0)    -- 8-bit Data Output
+    i_EN    : in  std_logic;            -- RAM Enable Input
+    i_clock : in  std_logic;            -- Clock
+    i_ADDR  : in  std_logic_vector(c_INTCHMAP_ADDR_BUS_W - 1 downto 0);  -- 11-bit Address Input
+    o_DO    : out std_logic_vector(c_INTCHMAP_DATA_BUS_W - 1 downto 0)  -- 8-bit Data Output
     -- o_DOP    : out std_logic                      -- 1-bit parity Output
     );
 end charmaps_ROM;
@@ -112,7 +114,7 @@ begin
     port map(
       DI   => (others => '1'),          -- 8-bit Data Input
       DIP  => (others => '1'),          -- 1-bit parity Input
-      EN   => s_EN,                      -- RAM Enable Input
+      EN   => s_EN,                     -- RAM Enable Input
       WE   => '0',                      -- Write Enable Input
       SSR  => '0',                      -- Synchronous Set/Reset Input
       CLK  => i_clock,                  -- Clock
