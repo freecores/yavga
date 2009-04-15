@@ -239,6 +239,33 @@ architecture rtl of vga_ctrl is
   signal s_cursor_x     : std_logic_vector(c_H_COUNT_W - 1 downto 0);
   signal s_cursor_y     : std_logic_vector(c_V_COUNT_W - 1 downto 0);
 
+  function f_is_cursor_pixel(
+    s_h, s_v, s_cur_x, s_cur_y : std_logic_vector)
+    return boolean is
+  begin
+    return ((s_h = s_cur_x) or (s_v = s_cur_y));
+  end f_is_cursor_pixel;
+
+  function f_is_grid_pixel(
+    s_h, s_v : std_logic_vector)
+    return boolean is
+  begin
+    return (
+      (s_h(c_GRID_BIT downto 0) = c_GRID_SIZE(c_GRID_BIT downto 0)) or
+      (s_v(c_GRID_BIT downto 0) = c_GRID_SIZE(c_GRID_BIT downto 0))
+      );
+  end f_is_grid_pixel;
+
+  function f_is_waveform_pixel(
+    s_v, s_wav, s_wav_prev : std_logic_vector)
+    return boolean is
+  begin
+    return (
+      ((s_v >= s_wav) and (s_v <= s_wav_prev)) or
+      ((s_v                    <= s_wav) and (s_v >= s_wav_prev))
+      );
+  end f_is_waveform_pixel;
+
 begin
   -- read config params from ram...
   p_config : process(i_clk)
@@ -414,29 +441,20 @@ begin
       else
         if s_display = '1' then         -- display zone
           if (
-            (s_h_count = s_cursor_x) or (s_v_count = s_cursor_y) or
-            (s_h_count(c_GRID_BIT downto 0) = c_GRID_SIZE(c_GRID_BIT downto 0)) or
-            (s_v_count(c_GRID_BIT downto 0) = c_GRID_SIZE(c_GRID_BIT downto 0))
-            )
-            and (s_v_count(9) = '0')    -- < 512
+            f_is_cursor_pixel(s_h_count, s_v_count, s_cursor_x, s_cursor_y) or
+            f_is_grid_pixel(s_h_count, s_v_count)
+            ) and (s_v_count(9) = '0')  -- < 512
           then  -- draw the cursor and/or WaveForm Grid references
             o_r <= s_cursor_color(2);
             o_g <= s_cursor_color(1);
             o_b <= s_cursor_color(0);
           elsif
-            ((s_v_count(9 downto 0) >= s_waveform_DOB(9 downto 0)) and
-             (s_v_count(9 downto 0) <= v_previous_pixel)
-             ) or
-            ((s_v_count(9 downto 0) <= s_waveform_DOB(9 downto 0)) and
-             (s_v_count(9 downto 0) >= v_previous_pixel)
-             )
+            f_is_waveform_pixel(s_v_count, s_waveform_DOB(c_V_COUNT_W - 1 downto 0), v_previous_pixel)
           then                          -- draw the waveform pixel...
             o_r <= s_waveform_DOB(12) or s_waveform_DOB(15);  -- the "or" is only
             o_g <= s_waveform_DOB(11) or s_waveform_DOB(14);  -- to not warning
             o_b <= s_waveform_DOB(10) or s_waveform_DOB(13);  -- unused signals
           else                          -- draw the background and charmaps
-            --if s_v_count > 512 then
-            --FULL_SCREEN if (s_v_count(9) = '1') then -- >= 512
             case (s_h_count(2 downto 0)) is
               when "000"  => o_g <= s_charmaps_DO(7) xor s_bg_color(1);
               when "001"  => o_g <= s_charmaps_DO(6) xor s_bg_color(1);
@@ -461,7 +479,7 @@ begin
         end if;  -- if s_display
         v_previous_pixel := s_waveform_DOB(9 downto 0);
       end if;  -- if i_reset
-    end if;
+    end if;  -- if rising_edge(i_clk)
   end process;
 
 end rtl;
