@@ -29,3 +29,6 @@ vga_ctrl.vhd
 
 waveform_RAM.vhd
   This file is the waveform ram
+
+yavga_pkg.vhd
+  yavga package

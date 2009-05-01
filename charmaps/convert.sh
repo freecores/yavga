@@ -50,11 +50,12 @@
 #### POSSIBILITY OF SUCH DAMAGE.                                            ####
 ################################################################################
 
+cat charmaps_ROM.vhd_head
 
-INIT_ELEM=32
+ROW_SIZE=4
+COL_NUM=0
 
-CURR_ELEM=0
-CURR_INIT=""
+CURR_NUM=0
 INIT_NUM=0
 while read LINE ; do
   case "${LINE}" in
@@ -63,27 +64,28 @@ while read LINE ; do
 
       *) HEX=`echo "obase=16; ibase=2; ${LINE}" | sed -e ' s/-/0/g ' | sed -e ' s/@/1/g ' | bc`
 
-         CURR_ELEM=$((${CURR_ELEM} + 1))
+         
 #         echo ${CURR_ELEM}
 
          if [ ${#HEX} = 1 ] ; then
-           CURR_INIT="0${HEX}${CURR_INIT}"
+           HEX="0${HEX}"
          else
-           CURR_INIT="${HEX}${CURR_INIT}"
+           HEX="${HEX}"
          fi
 
-         if [ ${CURR_ELEM} = ${INIT_ELEM} ] ; then
-           INIT_HEX=`echo "obase=16; ibase=10; ${INIT_NUM}" | bc`
-           echo "INIT_${INIT_HEX} => X\"${CURR_INIT}\","
-           CURR_ELEM=0
-           CURR_INIT=""
-
-           INIT_NUM=$((${INIT_NUM} + 1))
+         if [ ${COL_NUM} = 0 ] ; then
+           echo -en "\n    "
+           COL_NUM=${ROW_SIZE}
          fi
+
+         echo -n "${CURR_NUM} => X\"${HEX}\", "
+
+         CURR_NUM=$((${CURR_NUM} + 1))
+         COL_NUM=$((${COL_NUM} - 1))
 
          ;;
   esac
 done < chars.map
-           echo "INIT_${INIT_HEX} => X\"${CURR_INIT}\","
+echo -e "\n    others => X\"00\""
 
-
+cat charmaps_ROM.vhd_tail
