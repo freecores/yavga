@@ -204,7 +204,7 @@ begin
             s_chr_we   <= "1111";
             s_chr_addr <= "10010111000";
             s_chr_data <= "01010001" & "01010010" & "01010011" & "01010100";
-          when "101" =>                 -- write config grid and cursor color (overwrite RAM defaults)
+          when "101" =>  -- write config grid and cursor color (overwrite RAM defaults)
             s_chr_we      <= "1111";
             s_chr_addr    <= c_CFG_BG_CUR_COLOR_ADDR(c_CFG_BG_CUR_COLOR_ADDR'left downto 2);  -- c_CFG_BG_CUR_COLOR_ADDR >> 2
             --             ND   bgColor grid,cur   ND       curs_x          curs_y
